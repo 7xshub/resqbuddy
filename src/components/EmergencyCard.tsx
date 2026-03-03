@@ -8,38 +8,33 @@ interface EmergencyCardProps {
   index: number;
 }
 
-const severityLabel = {
-  critical: "CRITICAL",
-  high: "URGENT",
-  moderate: "MODERATE",
-};
-
 const EmergencyCard = ({ emergency, index }: EmergencyCardProps) => {
   const navigate = useNavigate();
   const Icon = emergency.icon;
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
       whileTap={{ scale: 0.97 }}
       onClick={() => navigate(`/emergency/${emergency.id}`)}
-      className="card-elevated flex flex-col items-center gap-3 p-5 transition-shadow hover:shadow-glow active:shadow-glow"
+      className="card-neumorphic flex items-center gap-3 p-4 text-left transition-shadow"
     >
       <div
-        className="flex h-14 w-14 items-center justify-center rounded-2xl"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
         style={{ backgroundColor: emergency.bgColor }}
       >
-        <Icon size={28} style={{ color: emergency.color }} />
+        <Icon size={24} style={{ color: emergency.color }} />
       </div>
-      <span className="text-sm font-bold text-foreground">{emergency.title}</span>
-      {emergency.severity === "critical" && (
-        <span className="flex items-center gap-1 rounded-full bg-emergency/10 px-2 py-0.5 text-[10px] font-bold text-emergency">
-          <AlertTriangle size={10} />
-          {severityLabel[emergency.severity]}
-        </span>
-      )}
+      <div className="flex-1">
+        <span className="text-sm font-bold text-foreground">{emergency.title}</span>
+        {emergency.severity === "critical" && (
+          <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-emergency/10 px-1.5 py-0.5 text-[9px] font-bold text-emergency">
+            <AlertTriangle size={8} /> CRITICAL
+          </span>
+        )}
+      </div>
     </motion.button>
   );
 };
