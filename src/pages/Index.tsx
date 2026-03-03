@@ -1,99 +1,102 @@
 import { motion } from "framer-motion";
-import { HeartPulse, Search, Wifi, WifiOff } from "lucide-react";
-import { useState, useEffect } from "react";
-import { emergencies } from "@/data/emergencies";
-import EmergencyCard from "@/components/EmergencyCard";
+import { HeartPulse, Search } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { categories, emergencies } from "@/data/emergencies";
 import EmergencyCallBar from "@/components/EmergencyCallBar";
 import BottomNav from "@/components/BottomNav";
 
 const Index = () => {
   const [search, setSearch] = useState("");
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const on = () => setIsOnline(true);
-    const off = () => setIsOnline(false);
-    window.addEventListener("online", on);
-    window.addEventListener("offline", off);
-    return () => {
-      window.removeEventListener("online", on);
-      window.removeEventListener("offline", off);
-    };
-  }, []);
-
-  const filtered = emergencies.filter((e) =>
-    e.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const hasSearch = search.trim().length > 0;
+  const filtered = hasSearch
+    ? emergencies.filter((e) => e.title.toLowerCase().includes(search.toLowerCase()))
+    : [];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background pb-28">
+    <div className="flex min-h-screen flex-col bg-background pb-36">
       {/* Header */}
-      <div className="px-5 pb-2 pt-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emergency/10">
-              <HeartPulse size={22} className="text-emergency" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">FirstAid</h1>
-              <p className="text-[10px] text-muted-foreground">Emergency Guide</p>
-            </div>
+      <div className="px-5 pt-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
+            <HeartPulse size={20} className="text-primary-foreground" />
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-card px-3 py-1.5 shadow-sm">
-            {isOnline ? (
-              <Wifi size={12} className="text-success" />
-            ) : (
-              <WifiOff size={12} className="text-warning" />
-            )}
-            <span className="text-[10px] font-medium text-muted-foreground">
-              {isOnline ? "Online" : "Offline"}
-            </span>
+          <div>
+            <h1 className="text-lg font-extrabold text-foreground">ResQbuddy</h1>
+            <p className="text-[10px] text-muted-foreground">Emergency Guide</p>
           </div>
         </div>
+      </div>
 
-        {/* Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 rounded-3xl bg-gradient-active p-5"
-        >
-          <h2 className="text-lg font-bold text-primary-foreground">
-            Stay Calm. Act Fast.
-          </h2>
-          <p className="mt-1 text-xs text-primary-foreground/80">
-            Tap an emergency below for step-by-step illustrated guidance. Works completely offline.
-          </p>
-        </motion.div>
+      {/* Title */}
+      <div className="mt-5 px-5">
+        <h2 className="text-xl font-bold text-foreground">Emergency Guide Selection</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Offline-first first-aid assistance</p>
+      </div>
 
-        {/* Search */}
-        <div className="relative mt-5">
+      {/* Search */}
+      <div className="mt-4 px-5">
+        <div className="relative">
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search emergencies..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-2xl bg-card py-3 pl-11 pr-4 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-xl bg-card py-3 pl-11 pr-4 text-sm text-foreground shadow-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30"
           />
         </div>
       </div>
 
-      {/* Emergency Grid */}
-      <div className="mt-4 px-5">
-        <p className="mb-3 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          Select Emergency
-        </p>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {filtered.map((emergency, i) => (
-            <EmergencyCard key={emergency.id} emergency={emergency} index={i} />
+      {/* Search results */}
+      {hasSearch && (
+        <div className="mt-4 flex flex-col gap-2 px-5">
+          {filtered.map((em) => {
+            const Icon = em.icon;
+            return (
+              <motion.button
+                key={em.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => navigate(`/emergency/${em.id}`)}
+                className="card-soft flex items-center gap-3 p-3 text-left"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: em.bgColor }}>
+                  <Icon size={20} style={{ color: em.color }} />
+                </div>
+                <span className="text-sm font-bold text-foreground">{em.title}</span>
+              </motion.button>
+            );
+          })}
+          {filtered.length === 0 && (
+            <p className="mt-4 text-center text-sm text-muted-foreground">No results for "{search}"</p>
+          )}
+        </div>
+      )}
+
+      {/* Category grid */}
+      {!hasSearch && (
+        <div className="mt-5 grid grid-cols-2 gap-4 px-5">
+          {categories.map((cat, i) => (
+            <motion.button
+              key={cat.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate(`/category/${cat.id}`)}
+              className={`card-neumorphic flex flex-col items-center gap-3 border-2 p-5 ${cat.borderClass}`}
+            >
+              <span className="text-3xl leading-none">{cat.emoji}</span>
+              <span className="text-sm font-bold text-foreground">{cat.title}</span>
+              <span className="text-[10px] text-muted-foreground text-center leading-tight">{cat.subtitle}</span>
+            </motion.button>
           ))}
         </div>
-        {filtered.length === 0 && (
-          <p className="mt-8 text-center text-sm text-muted-foreground">
-            No emergencies found for "{search}"
-          </p>
-        )}
-      </div>
+      )}
 
       <EmergencyCallBar />
       <BottomNav />

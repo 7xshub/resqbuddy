@@ -6,49 +6,56 @@
 
 @layer base {
   :root {
-    --background: 205 30% 92%;
+    --background: 210 20% 95%;
     --foreground: 210 30% 15%;
 
-    --card: 205 20% 96%;
+    --card: 0 0% 100%;
     --card-foreground: 210 30% 15%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 210 30% 15%;
 
-    --primary: 195 55% 60%;
+    --primary: 210 80% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 168 45% 62%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 205 15% 88%;
-    --muted-foreground: 205 15% 45%;
+    --muted: 210 15% 90%;
+    --muted-foreground: 210 10% 50%;
 
     --accent: 80 55% 65%;
     --accent-foreground: 210 30% 15%;
 
-    --destructive: 0 72% 60%;
+    --destructive: 0 72% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning: 24 95% 58%;
+    --warning: 30 95% 55%;
     --warning-foreground: 0 0% 100%;
 
-    --success: 152 55% 50%;
+    --success: 145 60% 45%;
     --success-foreground: 0 0% 100%;
 
-    --emergency: 0 72% 60%;
+    --emergency: 0 80% 55%;
     --emergency-foreground: 0 0% 100%;
 
-    --border: 205 20% 86%;
-    --input: 205 20% 86%;
-    --ring: 195 55% 60%;
+    --border: 210 15% 88%;
+    --input: 210 15% 88%;
+    --ring: 210 80% 55%;
 
-    --radius: 1.5rem;
+    --radius: 1rem;
 
-    --shadow-soft: 0px 10px 25px rgba(0, 0, 0, 0.06), 0px 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-card: 0px 8px 30px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0px 10px 20px rgba(95, 182, 216, 0.25);
-    --shadow-emergency: 0px 10px 20px rgba(255, 107, 44, 0.35);
+    --category-trauma: 210 80% 55%;
+    --category-environmental: 145 60% 45%;
+    --category-medical: 210 80% 55%;
+    --category-poisoning: 25 95% 55%;
+
+    --shadow-soft: 0px 4px 15px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0px 8px 25px rgba(0, 0, 0, 0.08);
+    --shadow-neumorphic: 6px 6px 12px rgba(0, 0, 0, 0.08), -6px -6px 12px rgba(255, 255, 255, 0.9);
+    --shadow-neumorphic-inset: inset 3px 3px 6px rgba(0, 0, 0, 0.06), inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+    --shadow-glow: 0px 8px 20px rgba(59, 130, 246, 0.25);
+    --shadow-emergency: 0px 8px 20px rgba(220, 38, 38, 0.3);
 
     --font-body: 'Manrope', system-ui, sans-serif;
 
@@ -69,7 +76,7 @@
     --card-foreground: 210 20% 92%;
     --popover: 210 20% 12%;
     --popover-foreground: 210 20% 92%;
-    --primary: 195 55% 55%;
+    --primary: 210 80% 55%;
     --primary-foreground: 0 0% 100%;
     --secondary: 168 45% 55%;
     --secondary-foreground: 0 0% 100%;
@@ -81,7 +88,7 @@
     --destructive-foreground: 210 40% 98%;
     --border: 210 15% 20%;
     --input: 210 15% 20%;
-    --ring: 195 55% 55%;
+    --ring: 210 80% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -107,13 +114,18 @@
 }
 
 @layer utilities {
+  .card-neumorphic {
+    @apply bg-card rounded-2xl;
+    box-shadow: var(--shadow-neumorphic);
+  }
+
   .card-soft {
-    @apply bg-card rounded-3xl;
+    @apply bg-card rounded-2xl;
     box-shadow: var(--shadow-soft);
   }
 
   .card-elevated {
-    @apply bg-card rounded-3xl;
+    @apply bg-card rounded-2xl;
     box-shadow: var(--shadow-card);
   }
 
@@ -125,17 +137,47 @@
     box-shadow: var(--shadow-emergency);
   }
 
+  .neumorphic-inset {
+    box-shadow: var(--shadow-neumorphic-inset);
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
   }
 
   .bg-gradient-active {
-    background: linear-gradient(180deg, hsl(195 55% 55%), hsl(195 55% 45%));
+    background: linear-gradient(180deg, hsl(210 80% 55%), hsl(210 80% 45%));
   }
 
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+
+  .category-border-trauma {
+    border-color: hsl(var(--category-trauma));
+  }
+  .category-border-environmental {
+    border-color: hsl(var(--category-environmental));
+  }
+  .category-border-medical {
+    border-color: hsl(var(--category-medical));
+  }
+  .category-border-poisoning {
+    border-color: hsl(var(--category-poisoning));
+  }
+
+  .category-bg-trauma {
+    background-color: hsl(var(--category-trauma) / 0.08);
+  }
+  .category-bg-environmental {
+    background-color: hsl(var(--category-environmental) / 0.08);
+  }
+  .category-bg-medical {
+    background-color: hsl(var(--category-medical) / 0.08);
+  }
+  .category-bg-poisoning {
+    background-color: hsl(var(--category-poisoning) / 0.08);
   }
 }
 

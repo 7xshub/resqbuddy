@@ -23,6 +23,8 @@ export interface TriageQuestion {
   noAction: string;
 }
 
+export type EmergencyCategory = "trauma" | "environmental" | "medical" | "poisoning";
+
 export interface EmergencyData {
   id: string;
   title: string;
@@ -30,10 +32,27 @@ export interface EmergencyData {
   color: string;
   bgColor: string;
   severity: "critical" | "high" | "moderate";
+  category: EmergencyCategory;
   steps: EmergencyStep[];
   noKitAlternatives: NoKitAlternative[];
   triage: TriageQuestion[];
 }
+
+export interface CategoryInfo {
+  id: EmergencyCategory;
+  title: string;
+  subtitle: string;
+  emoji: string;
+  borderClass: string;
+  bgClass: string;
+}
+
+export const categories: CategoryInfo[] = [
+  { id: "trauma", title: "Trauma", subtitle: "Fractures, Bleeding", emoji: "🩹🦴💉", borderClass: "category-border-trauma", bgClass: "category-bg-trauma" },
+  { id: "environmental", title: "Environmental", subtitle: "Snake Bite, Heatstroke, Drowning", emoji: "🐍☀️🌊⚡", borderClass: "category-border-environmental", bgClass: "category-bg-environmental" },
+  { id: "medical", title: "Medical", subtitle: "Heart Attack, Seizures, Choking", emoji: "❤️🧠💨", borderClass: "category-border-medical", bgClass: "category-bg-medical" },
+  { id: "poisoning", title: "Poisoning & Burns", subtitle: "Burns, Chemical exposure", emoji: "🔥🧪☠️", borderClass: "category-border-poisoning", bgClass: "category-bg-poisoning" },
+];
 
 export const emergencies: EmergencyData[] = [
   {
@@ -43,6 +62,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(152, 55%, 50%)",
     bgColor: "hsl(152, 55%, 92%)",
     severity: "critical",
+    category: "environmental",
     steps: [
       { step: 1, instruction: "Keep calm & still", detail: "Do NOT run. Movement spreads venom faster.", adultNote: "Sit or lie down immediately.", childNote: "Hold child still, comfort them." },
       { step: 2, instruction: "Remove jewelry", detail: "Remove rings, bracelets near the bite before swelling starts." },
@@ -68,6 +88,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(24, 95%, 58%)",
     bgColor: "hsl(24, 95%, 92%)",
     severity: "high",
+    category: "poisoning",
     steps: [
       { step: 1, instruction: "Cool with water", detail: "Run cool (not ice cold) water over burn for 10-20 minutes.", childNote: "Use lukewarm water for children to avoid shock." },
       { step: 2, instruction: "Remove clothing", detail: "Gently remove clothing near burn unless stuck to skin." },
@@ -91,6 +112,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(210, 30%, 45%)",
     bgColor: "hsl(210, 30%, 92%)",
     severity: "high",
+    category: "trauma",
     steps: [
       { step: 1, instruction: "Don't move the area", detail: "Keep the injured limb completely still." },
       { step: 2, instruction: "Support the injury", detail: "Use padding around the area for support." },
@@ -114,6 +136,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(0, 72%, 60%)",
     bgColor: "hsl(0, 72%, 93%)",
     severity: "critical",
+    category: "environmental",
     steps: [
       { step: 1, instruction: "Move to shade", detail: "Get person out of sun immediately into coolest area available." },
       { step: 2, instruction: "Cool rapidly", detail: "Pour cool water over body. Fan the person continuously." },
@@ -137,6 +160,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(280, 50%, 55%)",
     bgColor: "hsl(280, 50%, 93%)",
     severity: "critical",
+    category: "medical",
     steps: [
       { step: 1, instruction: "Ask: Can you cough?", detail: "If they can cough forcefully, encourage them to keep coughing." },
       { step: 2, instruction: "Give 5 back blows", detail: "Lean person forward. Hit firmly between shoulder blades.", adultNote: "Use heel of hand, firm blows.", childNote: "For infant: lay face down on forearm, support head." },
@@ -156,6 +180,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(0, 80%, 50%)",
     bgColor: "hsl(0, 80%, 93%)",
     severity: "high",
+    category: "trauma",
     steps: [
       { step: 1, instruction: "Apply direct pressure", detail: "Press firmly with clean cloth on wound. Do NOT remove." },
       { step: 2, instruction: "Elevate the area", detail: "Raise injured area above heart level if possible." },
@@ -178,6 +203,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(45, 90%, 55%)",
     bgColor: "hsl(45, 90%, 92%)",
     severity: "high",
+    category: "medical",
     steps: [
       { step: 1, instruction: "Clear the area", detail: "Move furniture and sharp objects away from person." },
       { step: 2, instruction: "Protect the head", detail: "Place something soft under head. Cushion it.", childNote: "Hold infant gently, protect head." },
@@ -199,6 +225,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(200, 70%, 50%)",
     bgColor: "hsl(200, 70%, 92%)",
     severity: "critical",
+    category: "environmental",
     steps: [
       { step: 1, instruction: "Get person out", detail: "Remove from water. Use a rope or branch if possible—don't jump in unless trained." },
       { step: 2, instruction: "Check breathing", detail: "Look, listen, feel for breathing for 10 seconds." },
@@ -222,6 +249,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(55, 85%, 50%)",
     bgColor: "hsl(55, 85%, 92%)",
     severity: "critical",
+    category: "environmental",
     steps: [
       { step: 1, instruction: "Cut the power", detail: "Turn off power source. Do NOT touch person if still connected." },
       { step: 2, instruction: "Use non-conductor", detail: "If can't cut power, use dry wood or rubber to separate person from source." },
@@ -244,6 +272,7 @@ export const emergencies: EmergencyData[] = [
     color: "hsl(350, 75%, 55%)",
     bgColor: "hsl(350, 75%, 92%)",
     severity: "critical",
+    category: "medical",
     steps: [
       { step: 1, instruction: "Call 108 immediately", detail: "Time is critical. Call emergency services first." },
       { step: 2, instruction: "Sit person down", detail: "Help them sit in comfortable position, knees bent." },
