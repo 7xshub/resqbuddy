@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, User, Baby, ChevronLeft, ChevronRight, CheckCircle2, Phone, Volume2 } from "lucide-react";
-import { emergencies } from "@/data/emergencies";
+import { useEmergencyDetail } from "@/hooks/use-emergencies";
+import { getIcon } from "@/lib/icon-map";
 import { Switch } from "@/components/ui/switch";
 
 type AgeGroup = "adult" | "child" | null;
@@ -13,13 +14,22 @@ const EmergencyDetailPage = () => {
   const [ageGroup, setAgeGroup] = useState<AgeGroup>(null);
   const [hasKit, setHasKit] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
-  const [triageStarted, setTriageStarted] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
 
-  const emergency = emergencies.find((e) => e.id === id);
-  if (!emergency) return <div className="p-8 text-center text-muted-foreground">Emergency not found</div>;
+  const { data, isLoading } = useEmergencyDetail(id);
 
-  const Icon = emergency.icon;
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!data) return <div className="p-8 text-center text-muted-foreground">Emergency not found</div>;
+
+  const { emergency, steps, noKitAlternatives, triage } = data;
+  const Icon = getIcon(emergency.icon_name);
 
   // Combined triage screen: age + kit + voice
   if (!ageGroup) {
@@ -31,12 +41,12 @@ const EmergencyDetailPage = () => {
 
         {/* Emergency header */}
         <div className="flex items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: emergency.bgColor }}>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: emergency.bg_color }}>
             <Icon size={28} style={{ color: emergency.color }} />
           </div>
           <div>
             <h1 className="text-xl font-bold text-foreground">{emergency.title}</h1>
-            <p className="text-xs text-muted-foreground">{emergency.steps.length} steps · Quick Assessment</p>
+            <p className="text-xs text-muted-foreground">{steps.length} steps · Quick Assessment</p>
           </div>
         </div>
 
@@ -80,7 +90,7 @@ const EmergencyDetailPage = () => {
         </div>
 
         {/* No kit toggle */}
-        {emergency.noKitAlternatives.length > 0 && (
+        {noKitAlternatives.length > 0 && (
           <div className="mt-6 card-neumorphic flex items-center justify-between p-4">
             <div>
               <p className="text-sm font-bold text-foreground">No First-Aid Kit?</p>
@@ -101,9 +111,10 @@ const EmergencyDetailPage = () => {
     );
   }
 
-  const steps = emergency.steps;
   const step = steps[currentStep];
   const progress = ((currentStep + 1) / steps.length) * 100;
+
+  if (!step) return <div className="p-8 text-center text-muted-foreground">No steps available</div>;
 
   return (
     <div className="flex min-h-screen flex-col bg-background pb-28">
@@ -148,7 +159,7 @@ const EmergencyDetailPage = () => {
           >
             <div className="card-neumorphic overflow-hidden">
               {/* Illustration area */}
-              <div className="flex h-40 items-center justify-center rounded-t-2xl" style={{ backgroundColor: emergency.bgColor }}>
+              <div className="flex h-40 items-center justify-center rounded-t-2xl" style={{ backgroundColor: emergency.bg_color }}>
                 <div className="flex h-20 w-20 items-center justify-center rounded-full bg-card/60 backdrop-blur-sm">
                   <Icon size={40} style={{ color: emergency.color }} />
                 </div>
@@ -158,22 +169,22 @@ const EmergencyDetailPage = () => {
               <div className="p-5">
                 <div className="mb-1 flex items-center gap-2">
                   <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">
-                    {step.step}
+                    {step.step_number}
                   </span>
-                  <span className="text-xs font-medium text-muted-foreground">Step {step.step}</span>
+                  <span className="text-xs font-medium text-muted-foreground">Step {step.step_number}</span>
                 </div>
                 <h2 className="mt-2 text-lg font-bold text-foreground">{step.instruction}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.detail}</p>
 
                 {/* Age-specific note */}
-                {ageGroup === "child" && step.childNote && (
+                {ageGroup === "child" && step.child_note && (
                   <div className="mt-3 rounded-xl bg-secondary/10 p-3">
-                    <p className="text-xs font-medium text-secondary">👶 For children: {step.childNote}</p>
+                    <p className="text-xs font-medium text-secondary">👶 For children: {step.child_note}</p>
                   </div>
                 )}
-                {ageGroup === "adult" && step.adultNote && (
+                {ageGroup === "adult" && step.adult_note && (
                   <div className="mt-3 rounded-xl bg-primary/10 p-3">
-                    <p className="text-xs font-medium text-primary">🧑 {step.adultNote}</p>
+                    <p className="text-xs font-medium text-primary">🧑 {step.adult_note}</p>
                   </div>
                 )}
 
@@ -208,25 +219,25 @@ const EmergencyDetailPage = () => {
         </AnimatePresence>
 
         {/* No kit banner */}
-        {!hasKit && emergency.noKitAlternatives.length > 0 && currentStep === 0 && (
+        {!hasKit && noKitAlternatives.length > 0 && currentStep === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-4 rounded-2xl bg-warning/10 p-4"
           >
             <p className="mb-2 text-xs font-bold text-warning">🏠 No Kit Mode — Use these alternatives:</p>
-            {emergency.noKitAlternatives.map((alt, i) => (
+            {noKitAlternatives.map((alt, i) => (
               <div key={i} className="mb-1 flex items-center gap-2 text-xs">
-                <span className="text-muted-foreground line-through">{alt.standard}</span>
-                <span className="text-foreground">→ {alt.alternative}</span>
+                <span className="text-muted-foreground line-through">{alt.standard_item}</span>
+                <span className="text-foreground">→ {alt.alternative_item}</span>
               </div>
             ))}
           </motion.div>
         )}
 
         {/* Triage on last step */}
-        {currentStep === steps.length - 1 && emergency.triage.length > 0 && (
-          <TriageSection triage={emergency.triage} />
+        {currentStep === steps.length - 1 && triage.length > 0 && (
+          <TriageSection triage={triage} />
         )}
       </div>
 
@@ -246,7 +257,7 @@ const EmergencyDetailPage = () => {
 };
 
 // Extracted triage component
-const TriageSection = ({ triage }: { triage: { question: string; yesAction: string; noAction: string }[] }) => {
+const TriageSection = ({ triage }: { triage: { question: string; yes_action: string; no_action: string }[] }) => {
   const [triageIndex, setTriageIndex] = useState<number | null>(null);
   const [triageAnswer, setTriageAnswer] = useState<string | null>(null);
 
@@ -284,7 +295,7 @@ const TriageSection = ({ triage }: { triage: { question: string; yesAction: stri
               animate={{ opacity: 1, y: 0 }}
               className="mt-3 text-sm font-medium text-foreground"
             >
-              → {triageAnswer === "yes" ? t.yesAction : t.noAction}
+              → {triageAnswer === "yes" ? t.yes_action : t.no_action}
             </motion.p>
           )}
         </div>

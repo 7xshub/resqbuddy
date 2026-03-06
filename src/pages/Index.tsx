@@ -2,13 +2,16 @@ import { motion } from "framer-motion";
 import { HeartPulse, Search } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { categories, emergencies } from "@/data/emergencies";
+import { useCategories, useEmergencies } from "@/hooks/use-emergencies";
+import { getIcon } from "@/lib/icon-map";
 import EmergencyCallBar from "@/components/EmergencyCallBar";
 import BottomNav from "@/components/BottomNav";
 
 const Index = () => {
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const { data: categories = [] } = useCategories();
+  const { data: emergencies = [] } = useEmergencies();
 
   const hasSearch = search.trim().length > 0;
   const filtered = hasSearch
@@ -54,7 +57,7 @@ const Index = () => {
       {hasSearch && (
         <div className="mt-4 flex flex-col gap-2 px-5">
           {filtered.map((em) => {
-            const Icon = em.icon;
+            const Icon = getIcon(em.icon_name);
             return (
               <motion.button
                 key={em.id}
@@ -64,7 +67,7 @@ const Index = () => {
                 onClick={() => navigate(`/emergency/${em.id}`)}
                 className="card-soft flex items-center gap-3 p-3 text-left"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: em.bgColor }}>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl" style={{ backgroundColor: em.bg_color }}>
                   <Icon size={20} style={{ color: em.color }} />
                 </div>
                 <span className="text-sm font-bold text-foreground">{em.title}</span>
@@ -88,7 +91,7 @@ const Index = () => {
               transition={{ delay: i * 0.08 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate(`/category/${cat.id}`)}
-              className={`card-neumorphic flex flex-col items-center gap-3 border-2 p-5 ${cat.borderClass}`}
+              className={`card-neumorphic flex flex-col items-center gap-3 border-2 p-5 ${cat.border_class}`}
             >
               <span className="text-3xl leading-none">{cat.emoji}</span>
               <span className="text-sm font-bold text-foreground">{cat.title}</span>
