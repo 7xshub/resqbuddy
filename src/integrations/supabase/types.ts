@@ -14,7 +14,185 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          bg_class: string
+          border_class: string
+          emoji: string
+          id: string
+          sort_order: number
+          subtitle: string
+          title: string
+        }
+        Insert: {
+          bg_class: string
+          border_class: string
+          emoji: string
+          id: string
+          sort_order?: number
+          subtitle: string
+          title: string
+        }
+        Update: {
+          bg_class?: string
+          border_class?: string
+          emoji?: string
+          id?: string
+          sort_order?: number
+          subtitle?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      emergencies: {
+        Row: {
+          bg_color: string
+          category_id: string
+          color: string
+          created_at: string
+          icon_name: string
+          id: string
+          severity: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          bg_color: string
+          category_id: string
+          color: string
+          created_at?: string
+          icon_name: string
+          id: string
+          severity: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          bg_color?: string
+          category_id?: string
+          color?: string
+          created_at?: string
+          icon_name?: string
+          id?: string
+          severity?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergencies_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emergency_steps: {
+        Row: {
+          adult_note: string | null
+          child_note: string | null
+          detail: string
+          emergency_id: string
+          id: string
+          instruction: string
+          step_number: number
+        }
+        Insert: {
+          adult_note?: string | null
+          child_note?: string | null
+          detail: string
+          emergency_id: string
+          id?: string
+          instruction: string
+          step_number: number
+        }
+        Update: {
+          adult_note?: string | null
+          child_note?: string | null
+          detail?: string
+          emergency_id?: string
+          id?: string
+          instruction?: string
+          step_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emergency_steps_emergency_id_fkey"
+            columns: ["emergency_id"]
+            isOneToOne: false
+            referencedRelation: "emergencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      no_kit_alternatives: {
+        Row: {
+          alternative_item: string
+          emergency_id: string
+          id: string
+          sort_order: number
+          standard_item: string
+        }
+        Insert: {
+          alternative_item: string
+          emergency_id: string
+          id?: string
+          sort_order?: number
+          standard_item: string
+        }
+        Update: {
+          alternative_item?: string
+          emergency_id?: string
+          id?: string
+          sort_order?: number
+          standard_item?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "no_kit_alternatives_emergency_id_fkey"
+            columns: ["emergency_id"]
+            isOneToOne: false
+            referencedRelation: "emergencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      triage_questions: {
+        Row: {
+          emergency_id: string
+          id: string
+          no_action: string
+          question: string
+          sort_order: number
+          yes_action: string
+        }
+        Insert: {
+          emergency_id: string
+          id?: string
+          no_action: string
+          question: string
+          sort_order?: number
+          yes_action: string
+        }
+        Update: {
+          emergency_id?: string
+          id?: string
+          no_action?: string
+          question?: string
+          sort_order?: number
+          yes_action?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_questions_emergency_id_fkey"
+            columns: ["emergency_id"]
+            isOneToOne: false
+            referencedRelation: "emergencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
