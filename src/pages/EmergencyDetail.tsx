@@ -35,7 +35,7 @@ const EmergencyDetailPage = () => {
   if (!ageGroup) {
     return (
       <div className="flex min-h-screen flex-col bg-background px-5 pb-28 pt-6">
-        <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+        <button onClick={() => { if (window.history.length > 1) navigate(-1); else navigate("/"); }} className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
           <ArrowLeft size={18} /> Back
         </button>
 
