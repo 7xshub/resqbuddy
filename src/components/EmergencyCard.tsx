@@ -1,16 +1,17 @@
 import { motion } from "framer-motion";
-import { type EmergencyData } from "@/data/emergencies";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle } from "lucide-react";
+import { getIcon } from "@/lib/icon-map";
+import type { Tables } from "@/integrations/supabase/types";
 
 interface EmergencyCardProps {
-  emergency: EmergencyData;
+  emergency: Tables<"emergencies">;
   index: number;
 }
 
 const EmergencyCard = ({ emergency, index }: EmergencyCardProps) => {
   const navigate = useNavigate();
-  const Icon = emergency.icon;
+  const Icon = getIcon(emergency.icon_name);
 
   return (
     <motion.button
@@ -23,7 +24,7 @@ const EmergencyCard = ({ emergency, index }: EmergencyCardProps) => {
     >
       <div
         className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl"
-        style={{ backgroundColor: emergency.bgColor }}
+        style={{ backgroundColor: emergency.bg_color }}
       >
         <Icon size={24} style={{ color: emergency.color }} />
       </div>
